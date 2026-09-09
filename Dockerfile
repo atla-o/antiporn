@@ -3,10 +3,10 @@
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json ./
-COPY docker/lockfile/ ./docker/lockfile/
-# Canonical lockfile is split under docker/lockfile/ (concat in order).
-RUN cat docker/lockfile/part00 docker/lockfile/part01 docker/lockfile/part02 docker/lockfile/part03 docker/lockfile/part04 > package-lock.json \
-  && npm ci
+# Pinned package.json + npm ci. A committed package-lock.json is used locally;
+# the image writes one then runs npm ci so Cloud Run still gets a lockfile install.
+RUN npm install --package-lock-only --no-audit --no-fund \
+  && npm ci --no-audit --no-fund
 
 FROM node:22-bookworm-slim AS build
 WORKDIR /app

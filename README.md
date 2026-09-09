@@ -43,7 +43,7 @@ Public host: [https://antiporn.devoutshaman.com](https://antiporn.devoutshaman.c
 
 **Push or merge to `main` updates this host.** Do not deploy to GCP from a cloud agent; GitHub Actions on `main` is the path.
 
-The production image is Next.js `output: "standalone"`, listening on `0.0.0.0:$PORT` (Cloud Run default `8080`). `npm ci` uses `package-lock.json` (assembled in the Dockerfile from `docker/lockfile/part*`).
+The production image is Next.js `output: "standalone"`, listening on `0.0.0.0:$PORT` (Cloud Run default `8080`). The Dockerfile runs `npm install --package-lock-only` then `npm ci` against pinned versions in `package.json`. Local clones that include `package-lock.json` can run `npm ci` directly.
 
 ### Auto-deploy
 
