@@ -1,1 +1,12 @@
-PLACEHOLDER_USE_FILE
+{
+  "name": "antiporn",
+  "version": "0.1.0",
+  "lockfileVersion": 3,
+  "requires": true,
+  "packages": {
+    "": {
+      "name": "antiporn",
+      "version": "0.1.0"
+    }
+  }
+}
