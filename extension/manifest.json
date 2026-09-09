@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Antiporn",
+  "version": "0.1.0",
+  "description": "Opaque squares over nudity. Honors Antiporn device restriction, severity, and time vault.",
+  "permissions": ["storage", "alarms", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Antiporn",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["detector.js", "content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
