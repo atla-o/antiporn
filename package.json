@@ -1,0 +1,44 @@
+{
+  "name": "antiporn",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Device restriction, nudity squares, and a non-stoppable time vault.",
+  "scripts": {
+    "dev": "next dev --turbopack --port 43147 --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --port 43147 --hostname 0.0.0.0",
+    "lint": "eslint",
+    "pack:extension": "mkdir -p public/downloads && rm -f public/downloads/antiporn-extension.zip && cd extension && zip -r ../public/downloads/antiporn-extension.zip .",
+    "test:ui": "playwright test"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-progress": "^1.1.8",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-slider": "^1.2.3",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-switch": "^1.2.6",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.544.0",
+    "next": "15.5.25",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "tailwind-merge": "^3.3.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/chrome": "^0.1.11",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.25",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
