@@ -1,0 +1,72 @@
+# Deploy Antiporn web UI to Cloud Run on push to main.
+# Public host: https://antiporn.devoutshaman.com
+# Service: antiporn-web  Project: devo-holding  Region: us-west1
+#
+# Do NOT pass --allow-unauthenticated. Org policy blocks allUsers IAM.
+# Public access uses --no-invoker-iam-check (invoker IAM disabled).
+#
+# GitHub Actions (atla-o/antiporn → Settings → Secrets and variables → Actions):
+#   vars.GCP_WORKLOAD_IDENTITY_PROVIDER
+#     projects/384302503084/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+#   vars.GCP_SERVICE_ACCOUNT
+#     github-cloud-run-deploy@devo-holding.iam.gserviceaccount.com
+# Same names may be stored as secrets if the operator prefers.
+
+name: Deploy Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: antiporn-web-us-west1
+  cancel-in-progress: false
+
+env:
+  GCP_PROJECT: devo-holding
+  GCP_REGION: us-west1
+  CLOUD_RUN_SERVICE: antiporn-web
+
+jobs:
+  deploy:
+    name: Deploy antiporn-web
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Require GCP Workload Identity configuration
+        env:
+          GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          GCP_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "${GCP_WORKLOAD_IDENTITY_PROVIDER}" ] || [ -z "${GCP_SERVICE_ACCOUNT}" ]; then
+            echo "::error::Set repository variables GCP_WORKLOAD_IDENTITY_PROVIDER and GCP_SERVICE_ACCOUNT (see README.md Production). Do not deploy without WIF."
+            exit 1
+          fi
+          echo "Auth: Workload Identity Federation."
+
+      - name: Authenticate to Google Cloud (Workload Identity Federation)
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.GCP_PROJECT }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy Cloud Run service antiporn-web
+        run: |
+          gcloud run deploy "${CLOUD_RUN_SERVICE}" \
+            --source=. \
+            --project="${GCP_PROJECT}" \
+            --region="${GCP_REGION}" \
+            --quiet \
+            --no-invoker-iam-check

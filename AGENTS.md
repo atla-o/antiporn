@@ -17,8 +17,10 @@ Devo. GitHub publisher [`atla-o`](https://github.com/atla-o). GCP project `devo-
 
 Antiporn. Computer restriction. Blocks porn and anything the user flags as a net negative.
 
-- Public OSS: [atla-o/antiporn](https://github.com/atla-o/antiporn)
+- Public OSS web UI: **this repo** — Filter, Time vault, Install (Preview + Extension nested), black-and-white chrome
+- Public host: https://antiporn.devoutshaman.com
 - Native Swift (private): [atla-o/anti-porn](https://github.com/atla-o/anti-porn) — Mac only
-- Web UI Cursor workspace: `devon-schauman/antiporn` (Filter, Time vault, Install)
 - Sibling: [atla-o/phenomatch](https://github.com/atla-o/phenomatch) (same process)
 - Holding: [atla-o/devo](https://github.com/atla-o/devo)
+
+Do not deploy to GCP from a cloud agent. GitHub Actions on `main` deploys Cloud Run service `antiporn-web`.
