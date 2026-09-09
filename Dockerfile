@@ -2,8 +2,11 @@
 # Next.js standalone listens on 0.0.0.0:$PORT (Cloud Run default 8080).
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json ./
+COPY docker/lockfile/ ./docker/lockfile/
+# Canonical lockfile is split under docker/lockfile/ (concat in order).
+RUN cat docker/lockfile/part00 docker/lockfile/part01 docker/lockfile/part02 docker/lockfile/part03 docker/lockfile/part04 > package-lock.json \
+  && npm ci
 
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
