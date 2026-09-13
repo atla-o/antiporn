@@ -52,6 +52,12 @@ export function backendStatus() {
   };
 }
 
+export async function ensureBackend() {
+  await probePersist();
+  await readDistro("install.sh");
+  return backendStatus();
+}
+
 async function readLocalLock(id: string): Promise<AppState | null> {
   try {
     const raw = await readFile(path.join(lockDir(), `${id}.json`), "utf8");
