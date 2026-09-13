@@ -23,6 +23,8 @@
 
 # production
 /build
+/public/downloads/*.zip
+!/public/downloads/.gitkeep
 
 # misc
 .DS_Store

@@ -1,8 +1,6 @@
 # Google Cloud distribution
 
-Canonical binary host (not source):
-
-https://storage.googleapis.com/antiporn-releases/latest/
+Optional operator mirror. The live Antiporn host already serves `install.sh`, the extension zip, and `website.html`. Publishing this bucket is not required for the web UI.
 
 Publish these objects to the `antiporn-releases` bucket, `latest/` prefix:
 

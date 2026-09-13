@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
+import { FlowNote } from "@/components/FlowNote";
 import { MAX_DAILY_CAP_HOURS, MAX_VAULT_DAYS } from "@/lib/state";
 import { formatClock, formatDuration, msUntilTomorrow } from "@/lib/utils";
 
@@ -39,12 +40,15 @@ export function TimeVaultPanel() {
       <CardContent className="space-y-5">
         {state.vault.active ? (
           <div className="space-y-4">
-            <div className="rounded-lg border border-black bg-white p-4">
+            <div className="rounded-lg border border-black bg-white p-4" data-testid="active-vault">
               <p className="text-xs uppercase tracking-widest text-neutral-600">Vault running</p>
               <p className="mt-1 font-mono text-3xl">{formatDuration(vaultLeft)}</p>
               <p className="mt-2 text-sm text-neutral-600">
                 No stop control exists. Factory reset is the abort path if you need it.
               </p>
+              <FlowNote tone="success" testId="vault-success">
+                Vault is sealed. There is no stop button.
+              </FlowNote>
             </div>
             {state.vault.dailyCapMinutes != null && (
               <div className="space-y-2">
@@ -67,6 +71,9 @@ export function TimeVaultPanel() {
           </div>
         ) : (
           <>
+            <FlowNote tone="empty" testId="vault-empty">
+              Vault is off on this profile.
+            </FlowNote>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <Label>Vault length</Label>
@@ -79,7 +86,7 @@ export function TimeVaultPanel() {
                 type="checkbox"
                 checked={useCap}
                 onChange={(e) => setUseCap(e.target.checked)}
-                className="accent-white"
+                className="accent-black"
               />
               Enforce a daily usage cap
             </label>
@@ -114,10 +121,16 @@ export function TimeVaultPanel() {
               {useCap ? ` Daily cap: ${capHours} hours.` : ""}
             </DialogDescription>
           </DialogHeader>
-          <Input value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="VAULT" />
+          <Input
+            data-testid="vault-confirm-input"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            placeholder="VAULT"
+          />
           <Button
             variant="lock"
             className="w-full"
+            data-testid="vault-confirm-submit"
             disabled={confirm !== "VAULT"}
             onClick={() => {
               engageVault(days, useCap ? capHours * 60 : null);

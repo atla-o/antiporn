@@ -1,17 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { DISTRO_CLOUD_EXTENSION_ZIP, GITHUB_URL } from "@/distribution/links";
+import { GITHUB_URL, LOCAL_EXTENSION_ZIP } from "@/distribution/links";
+import { FlowNote } from "@/components/FlowNote";
 import { Button } from "@/components/ui/button";
+import { copyText } from "@/lib/copy";
 
 export function ExtensionTab() {
   const [copied, setCopied] = useState(false);
-  const localZip = "/downloads/antiporn-extension.zip";
+  const [copyError, setCopyError] = useState<string | null>(null);
 
   async function copyPath() {
-    await navigator.clipboard.writeText("chrome://extensions");
+    setCopyError(null);
+    const ok = await copyText("chrome://extensions");
+    if (!ok) {
+      setCopyError("Clipboard is blocked. Type chrome://extensions in the address bar.");
+      return;
+    }
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    window.setTimeout(() => setCopied(false), 1500);
   }
 
   return (
@@ -24,14 +31,10 @@ export function ExtensionTab() {
       <ol className="list-decimal space-y-2 pl-5 text-neutral-600">
         <li>
           Download{" "}
-          <a className="underline" href={localZip}>
+          <a className="underline" href={LOCAL_EXTENSION_ZIP}>
             antiporn-extension.zip
           </a>{" "}
-          (local) or the{" "}
-          <a className="underline" href={DISTRO_CLOUD_EXTENSION_ZIP}>
-            Google Cloud copy
-          </a>
-          .
+          from this host.
         </li>
         <li>Unzip it. You should see manifest.json at the top level.</li>
         <li>
@@ -43,17 +46,18 @@ export function ExtensionTab() {
         </li>
         <li>Drag the unzipped folder onto that page, or use Load unpacked.</li>
       </ol>
+      {copyError && <FlowNote tone="error">{copyError}</FlowNote>}
       <p className="text-neutral-500">
         Chrome no longer installs arbitrary .crx files from websites. Unpacked / drag onto
-        chrome://extensions is the supported sideload path until a Web Store listing exists. Source
-        for the extension lives in <a className="underline" href={`${GITHUB_URL}/tree/main/extension`}>/extension</a>.
+        chrome://extensions is the supported sideload path. Source for the extension lives in{" "}
+        <a className="underline" href={`${GITHUB_URL}/tree/main/extension`}>
+          /extension
+        </a>
+        .
       </p>
       <div className="flex flex-wrap gap-2">
         <Button asChild>
-          <a href={localZip}>Download zip</a>
-        </Button>
-        <Button variant="outline" asChild>
-          <a href={DISTRO_CLOUD_EXTENSION_ZIP}>Cloud zip</a>
+          <a href={LOCAL_EXTENSION_ZIP}>Download zip</a>
         </Button>
       </div>
     </div>

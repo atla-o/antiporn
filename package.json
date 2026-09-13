@@ -5,7 +5,7 @@
   "description": "Device restriction, nudity squares, and a non-stoppable time vault.",
   "scripts": {
     "dev": "next dev --turbopack --port 43147 --hostname 0.0.0.0",
-    "build": "next build",
+    "build": "npm run pack:extension && next build",
     "start": "next start --port 43147 --hostname 0.0.0.0",
     "lint": "eslint",
     "pack:extension": "mkdir -p public/downloads && rm -f public/downloads/antiporn-extension.zip && cd extension && zip -r ../public/downloads/antiporn-extension.zip .",

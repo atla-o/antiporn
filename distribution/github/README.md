@@ -4,7 +4,7 @@ Source of truth for code, issues, and review:
 
 https://github.com/atla-o/antiporn
 
-This repository is the public code. Installable zips and `install.sh` are served from Google Cloud (`distribution/google-cloud/`), not from GitHub Releases, unless you also attach artifacts there.
+This repository is the public code. The live host serves the zip, `install.sh`, `website.html`, and `/embed`. A Cloud Storage mirror is optional.
 
 Clone:
 

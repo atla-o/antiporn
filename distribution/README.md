@@ -12,4 +12,11 @@ Each channel is a separate directory. Do not mix installers.
 | Google Cloud binaries | `distribution/google-cloud/` |
 | GitHub source | `distribution/github/` |
 
-Public URLs are defined in `src/distribution/links.ts`.
+The running Antiporn host is the live install channel:
+
+- `/downloads/antiporn-extension.zip`
+- `/install.sh`
+- `/website.html`
+- `/embed`
+
+Public URL helpers live in `src/distribution/links.ts`. Google Cloud Storage is an optional operator mirror, not a UI requirement.

@@ -13,7 +13,7 @@ export const DISTRIBUTION_METHODS = [
     id: "terminal",
     title: "Terminal copy-paste",
     path: "distribution/terminal/install.sh",
-    summary: "curl | bash installer when drag-and-drop is unavailable.",
+    summary: "curl | bash installer from this host when drag-and-drop is unavailable.",
   },
   {
     id: "embed",
@@ -37,7 +37,7 @@ export const DISTRIBUTION_METHODS = [
     id: "google-cloud",
     title: "Google Cloud distro",
     path: "distribution/google-cloud/",
-    summary: "Canonical binary host (install.sh, zip, website.html).",
+    summary: "Optional Cloud Storage mirror. The live app already serves zip, install.sh, and website.html.",
   },
   {
     id: "github",

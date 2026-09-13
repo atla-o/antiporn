@@ -56,52 +56,64 @@ function openDb(): Promise<IDBDatabase | null> {
   });
 }
 
-export async function loadState(): Promise<AppState> {
+export async function loadState(): Promise<{ state: AppState; warning: string | null }> {
   const now = Date.now();
-  const ls = parse(localStorage.getItem(STORAGE_KEY));
-  const mirror = parse(localStorage.getItem(STORAGE_MIRROR_KEY));
-  const ss = parse(sessionStorage.getItem(STORAGE_KEY));
-  let idb: AppState | null = null;
-  const db = await openDb();
-  if (db) {
-    idb = await new Promise((resolve) => {
-      try {
-        const tx = db.transaction(IDB_STORE, "readonly");
-        const req = tx.objectStore(IDB_STORE).get("state");
-        req.onsuccess = () => resolve((req.result as AppState) ?? null);
-        req.onerror = () => resolve(null);
-      } catch {
-        resolve(null);
-      }
-    });
-    db.close();
+  try {
+    const ls = parse(localStorage.getItem(STORAGE_KEY));
+    const mirror = parse(localStorage.getItem(STORAGE_MIRROR_KEY));
+    const ss = parse(sessionStorage.getItem(STORAGE_KEY));
+    let idb: AppState | null = null;
+    const db = await openDb();
+    if (db) {
+      idb = await new Promise((resolve) => {
+        try {
+          const tx = db.transaction(IDB_STORE, "readonly");
+          const req = tx.objectStore(IDB_STORE).get("state");
+          req.onsuccess = () => resolve((req.result as AppState) ?? null);
+          req.onerror = () => resolve(null);
+        } catch {
+          resolve(null);
+        }
+      });
+      db.close();
+    }
+    const state = strongest([ls, mirror, ss, idb], now);
+    const warning = await saveState(state);
+    return { state, warning };
+  } catch {
+    return {
+      state: defaultState(now),
+      warning: "Lock store could not be read. Working from a fresh session on this profile.",
+    };
   }
-  const state = strongest([ls, mirror, ss, idb], now);
-  await saveState(state);
-  return state;
 }
 
-export async function saveState(state: AppState): Promise<void> {
+export async function saveState(state: AppState): Promise<string | null> {
   const raw = JSON.stringify(state);
+  let memoryOk = false;
   try {
     localStorage.setItem(STORAGE_KEY, raw);
     localStorage.setItem(STORAGE_MIRROR_KEY, raw);
     sessionStorage.setItem(STORAGE_KEY, raw);
+    memoryOk = true;
   } catch {
     /* quota / private mode */
   }
+  let idbOk = false;
   const db = await openDb();
   if (db) {
-    await new Promise<void>((resolve) => {
+    idbOk = await new Promise((resolve) => {
       try {
         const tx = db.transaction(IDB_STORE, "readwrite");
         tx.objectStore(IDB_STORE).put(state, "state");
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => resolve();
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
       } catch {
-        resolve();
+        resolve(false);
       }
     });
     db.close();
   }
+  if (memoryOk || idbOk) return null;
+  return "Could not persist the lock store on this profile. A private window or full storage quota will not keep the timer across reloads.";
 }

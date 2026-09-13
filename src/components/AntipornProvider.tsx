@@ -9,6 +9,7 @@ type Ctx = {
   state: AppState;
   now: number;
   ready: boolean;
+  storeWarning: string | null;
   freeze: boolean;
   capReached: boolean;
   restrictionLeft: number;
@@ -24,6 +25,7 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppState>(defaultState);
   const [now, setNow] = useState(() => Date.now());
   const [ready, setReady] = useState(false);
+  const [storeWarning, setStoreWarning] = useState<string | null>(null);
   const stateRef = useRef(state);
   stateRef.current = state;
 
@@ -31,7 +33,8 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     loadState().then((loaded) => {
       if (!cancelled) {
-        setState(loaded);
+        setState(loaded.state);
+        setStoreWarning(loaded.warning);
         setReady(true);
       }
     });
@@ -42,7 +45,9 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    void saveState(state);
+    void saveState(state).then((warning) => {
+      setStoreWarning(warning);
+    });
   }, [state, ready]);
 
   useEffect(() => {
@@ -83,6 +88,7 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
       state,
       now,
       ready,
+      storeWarning,
       freeze,
       capReached,
       restrictionLeft: remainingRestriction(state, now),
@@ -91,7 +97,7 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
       engageVault,
       changeSeverity,
     }),
-    [state, now, ready, freeze, capReached, engageRestriction, engageVault, changeSeverity],
+    [state, now, ready, storeWarning, freeze, capReached, engageRestriction, engageVault, changeSeverity],
   );
 
   return <AntipornContext.Provider value={value}>{children}</AntipornContext.Provider>;

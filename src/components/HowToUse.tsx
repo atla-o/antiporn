@@ -1,11 +1,11 @@
 "use client";
 
-import { DISTRO_CLOUD_EXTENSION_ZIP, DISTRO_CLOUD_INSTALL_SH, DISTRO_CLOUD_URL, GITHUB_URL } from "@/distribution/links";
+import { GITHUB_URL, LOCAL_EMBED, LOCAL_EXTENSION_ZIP, LOCAL_INSTALL_SH, LOCAL_WEBSITE_HTML } from "@/distribution/links";
 
 const steps = [
   {
     title: "Install",
-    body: "Use drag-and-drop on Chromium, or paste the terminal installer when drop targets are blocked. Both pull the same package from Google Cloud Storage.",
+    body: "Download the extension zip from this host, or paste the terminal installer. Both pull the same packed folder. website.html and the embed route are here too.",
   },
   {
     title: "Set severity",
@@ -36,13 +36,30 @@ export function HowToUse() {
         </li>
       ))}
       <li className="text-sm text-neutral-500">
-        Distro: <a className="underline" href={DISTRO_CLOUD_URL}>{DISTRO_CLOUD_URL}</a>
+        Installer:{" "}
+        <a className="underline" href={LOCAL_INSTALL_SH}>
+          install.sh
+        </a>
         {" · "}
-        Source: <a className="underline" href={GITHUB_URL}>{GITHUB_URL}</a>
+        Extension:{" "}
+        <a className="underline" href={LOCAL_EXTENSION_ZIP}>
+          zip
+        </a>
         {" · "}
-        Installer: <a className="underline" href={DISTRO_CLOUD_INSTALL_SH}>install.sh</a>
+        Page:{" "}
+        <a className="underline" href={LOCAL_WEBSITE_HTML}>
+          website.html
+        </a>
         {" · "}
-        Extension: <a className="underline" href={DISTRO_CLOUD_EXTENSION_ZIP}>zip</a>
+        Embed:{" "}
+        <a className="underline" href={LOCAL_EMBED}>
+          /embed
+        </a>
+        {" · "}
+        Source:{" "}
+        <a className="underline" href={GITHUB_URL}>
+          {GITHUB_URL}
+        </a>
       </li>
     </ol>
   );

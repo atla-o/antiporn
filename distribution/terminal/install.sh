@@ -1,20 +1,27 @@
 #!/usr/bin/env bash
 # Antiporn terminal installer — copy-paste when drag-and-drop is unavailable.
-# Distro: https://storage.googleapis.com/antiporn-releases/latest/
+# Live files: this host (https://antiporn.devoutshaman.com) serves zip + install.sh.
 # Source: https://github.com/atla-o/antiporn
 set -euo pipefail
 
-CLOUD="${ANTIPORN_CLOUD_URL:-https://storage.googleapis.com/antiporn-releases/latest/}"
+ORIGIN="${ANTIPORN_ORIGIN:-https://antiporn.devoutshaman.com}"
+ORIGIN="${ORIGIN%/}"
 DEST="${ANTIPORN_HOME:-$HOME/.local/share/antiporn}"
 mkdir -p "$DEST"
 
+if [ -n "${ANTIPORN_CLOUD_URL:-}" ]; then
+  ZIP="${ANTIPORN_CLOUD_URL%/}/antiporn-extension.zip"
+else
+  ZIP="${ORIGIN}/downloads/antiporn-extension.zip"
+fi
+
 echo "Antiporn → $DEST"
-echo "Fetching extension zip from $CLOUD"
+echo "Fetching extension zip from $ZIP"
 
 if command -v curl >/dev/null 2>&1; then
-  curl -fsSL "${CLOUD}antiporn-extension.zip" -o "$DEST/antiporn-extension.zip"
+  curl -fsSL "$ZIP" -o "$DEST/antiporn-extension.zip"
 elif command -v wget >/dev/null 2>&1; then
-  wget -q "${CLOUD}antiporn-extension.zip" -O "$DEST/antiporn-extension.zip"
+  wget -q "$ZIP" -O "$DEST/antiporn-extension.zip"
 else
   echo "Need curl or wget." >&2
   exit 1

@@ -35,7 +35,16 @@ Each method is a separate directory — see `distribution/README.md`.
 | Google Cloud binaries | https://storage.googleapis.com/antiporn-releases/latest/ |
 | GitHub source | https://github.com/atla-o/antiporn |
 
-Copy `distribution/website/index.html` to your site. Point `NEXT_PUBLIC_DISTRO_CLOUD_URL` and `NEXT_PUBLIC_GITHUB_URL` at your real bucket and repo before a public deploy.
+The live host serves first-party install files — no Cloud Storage bucket is required for the UI:
+
+| File | URL |
+| --- | --- |
+| Extension zip | `/downloads/antiporn-extension.zip` |
+| Terminal installer | `/install.sh` |
+| Uploadable HTML | `/website.html` |
+| Embed | `/embed` |
+
+`npm run build` packs the extension zip before `next build`. Copy `distribution/website/index.html` to your own site if you want a standalone landing page. An optional GCS mirror can be pointed at with `NEXT_PUBLIC_DISTRO_CLOUD_URL`; the app does not block on it.
 
 ## Production (Cloud Run)
 

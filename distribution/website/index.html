@@ -32,7 +32,8 @@
         an optional daily cap. No in-app stop — factory reset is the abort.
       </p>
       <div class="row">
-        <a class="btn" href="https://storage.googleapis.com/antiporn-releases/latest/antiporn-extension.zip">Download from Google Cloud</a>
+        <a class="btn" id="zip" href="/downloads/antiporn-extension.zip">Download extension zip</a>
+        <a class="btn alt" id="sh" href="/install.sh" download="install.sh">Download install.sh</a>
         <a class="btn alt" href="https://github.com/atla-o/antiporn">Open source on GitHub</a>
       </div>
     </header>
@@ -41,7 +42,7 @@
         <section class="card" id="drag-drop">
           <h2>1. Drag and drop</h2>
           <ol>
-            <li>Download the zip from Google Cloud.</li>
+            <li>Download the extension zip from this page.</li>
             <li>Unzip so <code>manifest.json</code> is visible.</li>
             <li>Open <code>chrome://extensions</code>, enable Developer mode.</li>
             <li>Drop the folder onto that page.</li>
@@ -49,7 +50,7 @@
         </section>
         <section class="card" id="terminal">
           <h2>2. Terminal (if drop is blocked)</h2>
-          <pre>curl -fsSL https://storage.googleapis.com/antiporn-releases/latest/install.sh | bash</pre>
+          <pre id="curl">curl -fsSL /install.sh | bash</pre>
         </section>
       </div>
       <section style="margin-top:28px" id="preview">
@@ -59,8 +60,8 @@
       </section>
     </main>
     <footer>
-      Binaries:
-      <a href="https://storage.googleapis.com/antiporn-releases/latest/">storage.googleapis.com/antiporn-releases/latest/</a>
+      First-party files on this host:
+      <a id="files" href="/">this site</a>
       · Source:
       <a href="https://github.com/atla-o/antiporn">github.com/atla-o/antiporn</a>
     </footer>
@@ -68,6 +69,10 @@
       (function () {
         var origin = document.documentElement.getAttribute("data-app-origin") || window.location.origin;
         document.getElementById("app").src = origin + "/embed";
+        document.getElementById("zip").href = origin + "/downloads/antiporn-extension.zip";
+        document.getElementById("sh").href = origin + "/install.sh";
+        document.getElementById("curl").textContent = "curl -fsSL " + origin + "/install.sh | bash";
+        document.getElementById("files").href = origin + "/";
       })();
     </script>
   </body>
