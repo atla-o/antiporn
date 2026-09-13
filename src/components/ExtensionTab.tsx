@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GITHUB_URL, LOCAL_EXTENSION_ZIP } from "@/distribution/links";
+import { DISTRO_ZIP, GITHUB_URL } from "@/distribution/links";
 import { FlowNote } from "@/components/FlowNote";
 import { Button } from "@/components/ui/button";
 import { copyText } from "@/lib/copy";
@@ -31,10 +31,10 @@ export function ExtensionTab() {
       <ol className="list-decimal space-y-2 pl-5 text-neutral-600">
         <li>
           Download{" "}
-          <a className="underline" href={LOCAL_EXTENSION_ZIP}>
+          <a className="underline" href={DISTRO_ZIP}>
             antiporn-extension.zip
           </a>{" "}
-          from this host.
+          from <code>gs://antiporn-releases</code> via this API.
         </li>
         <li>Unzip it. You should see manifest.json at the top level.</li>
         <li>
@@ -57,7 +57,7 @@ export function ExtensionTab() {
       </p>
       <div className="flex flex-wrap gap-2">
         <Button asChild>
-          <a href={LOCAL_EXTENSION_ZIP}>Download zip</a>
+          <a href={DISTRO_ZIP}>Download zip</a>
         </Button>
       </div>
     </div>

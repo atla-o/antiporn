@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Antiporn terminal installer — copy-paste when drag-and-drop is unavailable.
-# Live files: this host (https://antiporn.devoutshaman.com) serves zip + install.sh.
-# Source: https://github.com/atla-o/antiporn
+# Antiporn terminal installer.
+# Artifacts: gs://antiporn-releases/latest/ in GCP project devo-holding.
+# Public download path is the Cloud Run API on this host.
 set -euo pipefail
 
 ORIGIN="${ANTIPORN_ORIGIN:-https://antiporn.devoutshaman.com}"
@@ -12,7 +12,7 @@ mkdir -p "$DEST"
 if [ -n "${ANTIPORN_CLOUD_URL:-}" ]; then
   ZIP="${ANTIPORN_CLOUD_URL%/}/antiporn-extension.zip"
 else
-  ZIP="${ORIGIN}/downloads/antiporn-extension.zip"
+  ZIP="${ORIGIN}/api/distro/antiporn-extension.zip"
 fi
 
 echo "Antiporn → $DEST"
@@ -43,7 +43,6 @@ Load the extension:
   2. Enable Developer mode
   3. Load unpacked → $DEST/extension
 
-If this machine blocks drag-and-drop, Load unpacked is the fallback.
-
+Bucket: gs://antiporn-releases (project devo-holding)
 Source: https://github.com/atla-o/antiporn
 EOF

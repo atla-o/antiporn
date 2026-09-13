@@ -1,17 +1,16 @@
 /**
- * Live install files are first-party on the Antiporn host.
- * Google Cloud Storage is an optional operator mirror — not required for the UI.
- *
- * Override public origin with NEXT_PUBLIC_APP_URL.
- * Override the optional GCS prefix with NEXT_PUBLIC_DISTRO_CLOUD_URL.
+ * Live install artifacts come from gs://antiporn-releases in project `devo-holding`.
+ * The Cloud Run API at /api/distro/* is the working public download path (org policy
+ * blocks allUsers on the bucket itself).
  */
 
 export const APP_PUBLIC_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://antiporn.devoutshaman.com";
 
-export const LOCAL_EXTENSION_ZIP = "/downloads/antiporn-extension.zip";
-export const LOCAL_INSTALL_SH = "/install.sh";
-export const LOCAL_WEBSITE_HTML = "/website.html";
+export const DISTRO_ZIP = "/api/distro/antiporn-extension.zip";
+export const DISTRO_INSTALL_SH = "/api/distro/install.sh";
+export const DISTRO_WEBSITE_HTML = "/api/distro/website.html";
+export const DISTRO_SNIPPET = "/api/distro/snippet.html";
 export const LOCAL_EMBED = "/embed";
 
 export const DISTRO_CLOUD_URL =

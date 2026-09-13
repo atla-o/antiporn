@@ -69,4 +69,18 @@ jobs:
             --project="${GCP_PROJECT}" \
             --region="${GCP_REGION}" \
             --quiet \
-            --no-invoker-iam-check
+            --no-invoker-iam-check \
+            --update-env-vars=GCP_PROJECT=devo-holding,GCS_BUCKET=antiporn-releases
+
+      - name: Set up Node for distro publish
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Publish install artifacts to gs://antiporn-releases
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y zip
+          npm install --no-audit --no-fund
+          npm run pack:extension
+          bash scripts/publish-distro.sh

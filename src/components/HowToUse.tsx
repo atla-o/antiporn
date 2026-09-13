@@ -1,11 +1,11 @@
 "use client";
 
-import { GITHUB_URL, LOCAL_EMBED, LOCAL_EXTENSION_ZIP, LOCAL_INSTALL_SH, LOCAL_WEBSITE_HTML } from "@/distribution/links";
+import { DISTRO_INSTALL_SH, DISTRO_WEBSITE_HTML, DISTRO_ZIP, GITHUB_URL, LOCAL_EMBED } from "@/distribution/links";
 
 const steps = [
   {
     title: "Install",
-    body: "Download the extension zip from this host, or paste the terminal installer. Both pull the same packed folder. website.html and the embed route are here too.",
+    body: "Download the extension zip from gs://antiporn-releases via this host’s distro API, or paste the terminal installer. website.html and the embed route are here too.",
   },
   {
     title: "Set severity",
@@ -13,11 +13,11 @@ const steps = [
   },
   {
     title: "Engage filter",
-    body: "Choose 1–30 days and type LOCK. Settings freeze. Closing the app does not stop the clock.",
+    body: "Choose 1–30 days and type LOCK. Settings freeze and persist through the Cloud Run lock API in devo-holding.",
   },
   {
     title: "Seal a vault if you need it",
-    body: "Up to 7 days, optional daily cap (for example 3 hours). No stop control. Factory reset is the abort.",
+    body: "Up to 7 days, optional daily cap (for example 3 hours). No stop control. The timer is stored on the server for this profile id.",
   },
   {
     title: "Keep the extension on",
@@ -37,17 +37,17 @@ export function HowToUse() {
       ))}
       <li className="text-sm text-neutral-500">
         Installer:{" "}
-        <a className="underline" href={LOCAL_INSTALL_SH}>
+        <a className="underline" href={DISTRO_INSTALL_SH}>
           install.sh
         </a>
         {" · "}
         Extension:{" "}
-        <a className="underline" href={LOCAL_EXTENSION_ZIP}>
+        <a className="underline" href={DISTRO_ZIP}>
           zip
         </a>
         {" · "}
         Page:{" "}
-        <a className="underline" href={LOCAL_WEBSITE_HTML}>
+        <a className="underline" href={DISTRO_WEBSITE_HTML}>
           website.html
         </a>
         {" · "}

@@ -15,7 +15,7 @@ import { MAX_DAILY_CAP_HOURS, MAX_VAULT_DAYS } from "@/lib/state";
 import { formatClock, formatDuration, msUntilTomorrow } from "@/lib/utils";
 
 export function TimeVaultPanel() {
-  const { state, vaultLeft, capReached, engageVault } = useAntiporn();
+  const { state, vaultLeft, capReached, engageVault, syncStatus, persistLabel } = useAntiporn();
   const [days, setDays] = useState(1);
   const [capHours, setCapHours] = useState(3);
   const [useCap, setUseCap] = useState(true);
@@ -47,7 +47,7 @@ export function TimeVaultPanel() {
                 No stop control exists. Factory reset is the abort path if you need it.
               </p>
               <FlowNote tone="success" testId="vault-success">
-                Vault is sealed. There is no stop button.
+                Vault is sealed on {persistLabel} ({syncStatus}). There is no stop button.
               </FlowNote>
             </div>
             {state.vault.dailyCapMinutes != null && (

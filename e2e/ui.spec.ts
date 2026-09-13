@@ -39,7 +39,7 @@ test("preview rejects a non-image file", async ({ page }) => {
   await expect(page.getByTestId("nudity-error")).toContainText("Use an image file.");
 });
 
-test("restriction lock requires LOCK and then shows countdown", async ({ page }) => {
+test("restriction lock requires LOCK, persists through the lock API", async ({ page, request }) => {
   await page.goto("/");
   await page.evaluate(() => {
     localStorage.clear();
@@ -55,6 +55,28 @@ test("restriction lock requires LOCK and then shows countdown", async ({ page })
   await expect(page.getByText("Active filter")).toBeVisible();
   await expect(page.getByText("Severity is frozen while a filter or vault is active.")).toBeVisible();
   await expect(page.getByTestId("filter-success")).toBeVisible();
+  await expect(page.getByTestId("lock-sync")).toHaveText(/saved|local/, { timeout: 15_000 });
+
+  const profileId = await page.evaluate(() => localStorage.getItem("antiporn.v1.profileId"));
+  expect(profileId).toBeTruthy();
+  const remote = await request.get(`/api/locks/${profileId}`);
+  expect(remote.ok()).toBeTruthy();
+  const body = (await remote.json()) as { state?: { restriction?: { active?: boolean } } };
+  expect(body.state?.restriction?.active).toBeTruthy();
+
+  await page.evaluate(async (id) => {
+    localStorage.clear();
+    sessionStorage.clear();
+    await new Promise((resolve) => {
+      const req = indexedDB.deleteDatabase("antiporn");
+      req.onsuccess = () => resolve(null);
+      req.onerror = () => resolve(null);
+      req.onblocked = () => resolve(null);
+    });
+    localStorage.setItem("antiporn.v1.profileId", id as string);
+  }, profileId);
+  await page.reload();
+  await expect(page.getByTestId("active-lock")).toBeVisible();
 });
 
 test("tabs: vault and install (preview + extension nested)", async ({ page }) => {
@@ -73,13 +95,13 @@ test("tabs: vault and install (preview + extension nested)", async ({ page }) =>
   await expect(page.getByText("curl -fsSL")).toBeVisible();
   await expect(page.getByTestId("download-extension-zip")).toHaveAttribute(
     "href",
-    "/downloads/antiporn-extension.zip",
+    "/api/distro/antiporn-extension.zip",
   );
-  await expect(page.getByTestId("download-install-sh")).toHaveAttribute("href", "/install.sh");
-  await expect(page.getByTestId("download-website-html")).toHaveAttribute("href", "/website.html");
+  await expect(page.getByTestId("download-install-sh")).toHaveAttribute("href", "/api/distro/install.sh");
+  await expect(page.getByTestId("download-website-html")).toHaveAttribute("href", "/api/distro/website.html");
   await expect(page.getByTestId("open-embed")).toHaveAttribute("href", "/embed");
   await expect(page.getByRole("link", { name: /github\.com\/atla-o\/antiporn/ })).toBeVisible();
-  await expect(page.getByTestId("install-assets")).toContainText(/ready on this host|Checking install files/);
+  await expect(page.getByTestId("install-assets")).toContainText(/ready from|Checking install/);
 
   await page.getByRole("tab", { name: "Preview" }).click();
   await expect(page.getByRole("heading", { name: "How to use" })).toBeVisible();
@@ -88,18 +110,28 @@ test("tabs: vault and install (preview + extension nested)", async ({ page }) =>
   await page.getByRole("tab", { name: "Extension" }).click();
   await expect(page.getByRole("link", { name: "Download zip" })).toHaveAttribute(
     "href",
-    "/downloads/antiporn-extension.zip",
+    "/api/distro/antiporn-extension.zip",
   );
 });
 
-test("website html and embed routes", async ({ page, request }) => {
-  const zip = await request.get("/downloads/antiporn-extension.zip");
+test("website html, embed, and distro API", async ({ page, request }) => {
+  const health = await request.get("/api/health");
+  expect(health.ok()).toBeTruthy();
+  const info = (await health.json()) as { project?: string; bucket?: string };
+  expect(info.project).toBe("devo-holding");
+  expect(info.bucket).toBe("antiporn-releases");
+
+  const zip = await request.get("/api/distro/antiporn-extension.zip");
   expect(zip.ok()).toBeTruthy();
   expect((await zip.body()).byteLength).toBeGreaterThan(100);
 
-  const installer = await request.get("/install.sh");
+  const installer = await request.get("/api/distro/install.sh");
   expect(installer.ok()).toBeTruthy();
   expect(await installer.text()).toContain("antiporn-extension.zip");
+
+  const pageFile = await request.get("/api/distro/website.html");
+  expect(pageFile.ok()).toBeTruthy();
+  expect(await pageFile.text()).toContain("Antiporn");
 
   await page.goto("/website.html");
   await expect(page.getByRole("heading", { name: "Antiporn" })).toBeVisible();

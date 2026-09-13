@@ -12,11 +12,11 @@ Each channel is a separate directory. Do not mix installers.
 | Google Cloud binaries | `distribution/google-cloud/` |
 | GitHub source | `distribution/github/` |
 
-The running Antiporn host is the live install channel:
+Working downloads are the Cloud Run API, which reads `gs://antiporn-releases` in project `devo-holding`:
 
-- `/downloads/antiporn-extension.zip`
-- `/install.sh`
-- `/website.html`
+- `/api/distro/antiporn-extension.zip`
+- `/api/distro/install.sh`
+- `/api/distro/website.html`
 - `/embed`
 
-Public URL helpers live in `src/distribution/links.ts`. Google Cloud Storage is an optional operator mirror, not a UI requirement.
+Helpers live in `src/distribution/links.ts`. Bucket setup: `gcp/README.md`.

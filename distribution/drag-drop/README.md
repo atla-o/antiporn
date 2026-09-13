@@ -2,7 +2,7 @@
 
 Primary install path for Chromium.
 
-1. Download [antiporn-extension.zip](https://antiporn.devoutshaman.com/downloads/antiporn-extension.zip) from the Antiporn host (`/downloads/antiporn-extension.zip` on any running app).
+1. Download [antiporn-extension.zip](https://antiporn.devoutshaman.com/api/distro/antiporn-extension.zip) (`gs://antiporn-releases/latest/antiporn-extension.zip` via the Cloud Run API).
 2. Unzip. Confirm `manifest.json` is at the folder root.
 3. Open `chrome://extensions` and turn on Developer mode.
 4. Drag the unzipped folder onto that page (or click Load unpacked).

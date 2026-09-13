@@ -37,7 +37,7 @@ export const DISTRIBUTION_METHODS = [
     id: "google-cloud",
     title: "Google Cloud distro",
     path: "distribution/google-cloud/",
-    summary: "Optional Cloud Storage mirror. The live app already serves zip, install.sh, and website.html.",
+    summary: "gs://antiporn-releases in project devo-holding. Public downloads via /api/distro/*.",
   },
   {
     id: "github",

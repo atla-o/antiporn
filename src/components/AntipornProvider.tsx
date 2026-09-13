@@ -3,13 +3,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { dailyCapReached, remainingRestriction, remainingVault, setSeverity, startRestriction, startVault, tickUsage } from "@/lib/engine";
 import { defaultState, expireLocks, type AppState } from "@/lib/state";
-import { loadState, saveState } from "@/lib/persist";
+import { getProfileId, loadState, saveState, setProfileId, type SyncStatus } from "@/lib/persist";
 
 type Ctx = {
   state: AppState;
   now: number;
   ready: boolean;
   storeWarning: string | null;
+  syncStatus: SyncStatus;
+  profileId: string;
+  persistLabel: string;
   freeze: boolean;
   capReached: boolean;
   restrictionLeft: number;
@@ -17,6 +20,7 @@ type Ctx = {
   engageRestriction: (days: number) => void;
   engageVault: (days: number, dailyCapMinutes: number | null) => void;
   changeSeverity: (value: number) => void;
+  restoreProfile: (id: string) => Promise<boolean>;
 };
 
 const AntipornContext = createContext<Ctx | null>(null);
@@ -26,8 +30,10 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
   const [now, setNow] = useState(() => Date.now());
   const [ready, setReady] = useState(false);
   const [storeWarning, setStoreWarning] = useState<string | null>(null);
-  const stateRef = useRef(state);
-  stateRef.current = state;
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>("loading");
+  const [profileId, setProfile] = useState("");
+  const [persistLabel, setPersistLabel] = useState("Cloud Run API");
+  const lastLockRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -35,9 +41,27 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
       if (!cancelled) {
         setState(loaded.state);
         setStoreWarning(loaded.warning);
+        setProfile(loaded.profileId);
+        setSyncStatus(loaded.remote ? "saved" : loaded.warning ? "error" : "local");
         setReady(true);
       }
     });
+    fetch("/api/health")
+      .then((res) => res.json())
+      .then((info: { persist?: string; project?: string }) => {
+        if (cancelled) return;
+        const persist = info.persist ?? "gcp";
+        setPersistLabel(
+          persist === "local"
+            ? "Cloud Run API (local store)"
+            : persist === "gcs"
+              ? "GCS locks in devo-holding"
+              : persist === "firestore"
+                ? "Firestore in devo-holding"
+                : "Cloud Run API in devo-holding",
+        );
+      })
+      .catch(() => undefined);
     return () => {
       cancelled = true;
     };
@@ -45,8 +69,18 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    void saveState(state).then((warning) => {
-      setStoreWarning(warning);
+    const lockKey = [
+      state.restriction.active,
+      state.restriction.endsAt,
+      state.vault.active,
+      state.vault.endsAt,
+      state.severity,
+    ].join(":");
+    const lockChanged = lastLockRef.current !== null && lastLockRef.current !== lockKey;
+    lastLockRef.current = lockKey;
+    void saveState(state, { immediate: lockChanged }).then((result) => {
+      setStoreWarning(result.warning);
+      setSyncStatus(result.status);
     });
   }, [state, ready]);
 
@@ -80,6 +114,19 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => setSeverity(prev, value));
   }, []);
 
+  const restoreProfile = useCallback(async (id: string) => {
+    if (!setProfileId(id)) return false;
+    setReady(false);
+    setSyncStatus("loading");
+    const loaded = await loadState();
+    setState(loaded.state);
+    setStoreWarning(loaded.warning);
+    setProfile(loaded.profileId);
+    setSyncStatus(loaded.remote ? "saved" : loaded.warning ? "error" : "local");
+    setReady(true);
+    return true;
+  }, []);
+
   const freeze = state.restriction.active || state.vault.active;
   const capReached = dailyCapReached(state);
 
@@ -89,6 +136,9 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
       now,
       ready,
       storeWarning,
+      syncStatus,
+      profileId: profileId || getProfileId(),
+      persistLabel,
       freeze,
       capReached,
       restrictionLeft: remainingRestriction(state, now),
@@ -96,8 +146,23 @@ export function AntipornProvider({ children }: { children: React.ReactNode }) {
       engageRestriction,
       engageVault,
       changeSeverity,
+      restoreProfile,
     }),
-    [state, now, ready, storeWarning, freeze, capReached, engageRestriction, engageVault, changeSeverity],
+    [
+      state,
+      now,
+      ready,
+      storeWarning,
+      syncStatus,
+      profileId,
+      persistLabel,
+      freeze,
+      capReached,
+      engageRestriction,
+      engageVault,
+      changeSeverity,
+      restoreProfile,
+    ],
   );
 
   return <AntipornContext.Provider value={value}>{children}</AntipornContext.Provider>;

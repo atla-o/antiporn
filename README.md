@@ -35,16 +35,18 @@ Each method is a separate directory — see `distribution/README.md`.
 | Google Cloud binaries | https://storage.googleapis.com/antiporn-releases/latest/ |
 | GitHub source | https://github.com/atla-o/antiporn |
 
-The live host serves first-party install files — no Cloud Storage bucket is required for the UI:
+Install artifacts live in **`gs://antiporn-releases`** (project `devo-holding`). Org policy blocks public bucket ACLs, so the working download URLs are the Cloud Run API:
 
-| File | URL |
-| --- | --- |
-| Extension zip | `/downloads/antiporn-extension.zip` |
-| Terminal installer | `/install.sh` |
-| Uploadable HTML | `/website.html` |
-| Embed | `/embed` |
+| File | Working URL | GCS object |
+| --- | --- | --- |
+| Extension zip | `/api/distro/antiporn-extension.zip` | `latest/antiporn-extension.zip` |
+| Terminal installer | `/api/distro/install.sh` | `latest/install.sh` |
+| Uploadable HTML | `/api/distro/website.html` | `latest/website.html` |
+| Embed | `/embed` | live app (snippet at `latest/snippet.html`) |
 
-`npm run build` packs the extension zip before `next build`. Copy `distribution/website/index.html` to your own site if you want a standalone landing page. An optional GCS mirror can be pointed at with `NEXT_PUBLIC_DISTRO_CLOUD_URL`; the app does not block on it.
+Filter and Time vault persist through `GET/PUT /api/locks/:profileId` (Firestore `antipornLocks`, falling back to `gs://antiporn-releases/locks/`). The browser only caches. See [gcp/README.md](gcp/README.md).
+
+`npm run build` packs the extension zip before `next build`. Merge to `main` publishes `latest/*` to the bucket. Do not deploy Cloud Run from a cloud agent.
 
 ## Production (Cloud Run)
 

@@ -1,6 +1,10 @@
 # Google Cloud distribution
 
-Optional operator mirror. The live Antiporn host already serves `install.sh`, the extension zip, and `website.html`. Publishing this bucket is not required for the web UI.
+Canonical artifact bucket in project `devo-holding`:
+
+`gs://antiporn-releases`
+
+The web UI does not link dead public GCS URLs (org policy blocks `allUsers`). Users download through `/api/distro/*` on Cloud Run `antiporn-web`, which reads this bucket.
 
 Publish these objects to the `antiporn-releases` bucket, `latest/` prefix:
 

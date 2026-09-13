@@ -96,7 +96,8 @@ function InstallHub({ embed }: { embed?: boolean }) {
 }
 
 function Shell({ embed }: { embed?: boolean }) {
-  const { ready, storeWarning, state, restrictionLeft, vaultLeft } = useAntiporn();
+  const { ready, storeWarning, syncStatus, persistLabel, profileId, state, restrictionLeft, vaultLeft } =
+    useAntiporn();
   const [tab, setTab] = useState("filter");
 
   useEffect(() => {
@@ -126,6 +127,12 @@ function Shell({ embed }: { embed?: boolean }) {
             </span>
             <span className="rounded-md border border-neutral-300 px-2 py-1 font-mono">
               {state.vault.active ? `Vault ${formatDuration(vaultLeft)}` : "Vault off"}
+            </span>
+            <span className="rounded-md border border-neutral-300 px-2 py-1 font-mono" data-testid="lock-sync">
+              {syncStatus}
+            </span>
+            <span className="rounded-md border border-neutral-300 px-2 py-1 text-neutral-600" title={profileId}>
+              {persistLabel}
             </span>
           </div>
         </div>

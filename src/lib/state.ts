@@ -2,6 +2,7 @@ import { todayKey } from "./utils";
 
 export const STORAGE_KEY = "antiporn.v1.state";
 export const STORAGE_MIRROR_KEY = "antiporn.v1.mirror";
+export const PROFILE_KEY = "antiporn.v1.profileId";
 export const IDB_NAME = "antiporn";
 export const IDB_STORE = "locks";
 
@@ -86,4 +87,40 @@ export function dailyCapReached(state: AppState): boolean {
 
 export function isSettingsFrozen(state: AppState): boolean {
   return state.restriction.active || state.vault.active;
+}
+
+export function isProfileId(id: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+}
+
+export function parseState(raw: unknown): AppState | null {
+  if (!raw) return null;
+  try {
+    const data = (typeof raw === "string" ? JSON.parse(raw) : raw) as AppState;
+    if (!data || data.version !== 1) return null;
+    if (!data.restriction || !data.vault || !data.usage) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+export function strongestStates(candidates: Array<AppState | null>, now = Date.now()): AppState {
+  const valid = candidates.filter((c): c is AppState => Boolean(c)).map((c) => expireLocks(c, now));
+  if (!valid.length) return defaultState(now);
+  return valid.reduce((best, cur) => {
+    const bestLock = Math.max(
+      best.restriction.active ? best.restriction.endsAt : 0,
+      best.vault.active ? best.vault.endsAt : 0,
+    );
+    const curLock = Math.max(
+      cur.restriction.active ? cur.restriction.endsAt : 0,
+      cur.vault.active ? cur.vault.endsAt : 0,
+    );
+    if (curLock > bestLock) return cur;
+    if (cur.usage.usedMs > best.usage.usedMs && cur.usage.dayKey === best.usage.dayKey) {
+      return { ...best, usage: cur.usage };
+    }
+    return best;
+  });
 }
