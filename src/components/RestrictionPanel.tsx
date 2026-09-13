@@ -9,11 +9,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { FlowNote } from "@/components/FlowNote";
 import { MAX_RESTRICTION_DAYS } from "@/lib/state";
 import { formatDuration } from "@/lib/utils";
 
 export function RestrictionPanel() {
-  const { state, freeze, restrictionLeft, engageRestriction } = useAntiporn();
+  const { state, freeze, restrictionLeft, engageRestriction, syncStatus, persistLabel } = useAntiporn();
   const [days, setDays] = useState(7);
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState("");
@@ -39,9 +40,15 @@ export function RestrictionPanel() {
               Ends {new Date(state.restriction.endsAt).toLocaleString()}. Stopping early requires a
               factory reset of this device or browser profile.
             </p>
+            <FlowNote tone="success" testId="filter-success">
+              Filter is locked on this profile. {persistLabel} status: {syncStatus}.
+            </FlowNote>
           </div>
         ) : (
           <>
+            <FlowNote tone="empty" testId="filter-empty">
+              Filter is off on this profile.
+            </FlowNote>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <Label>Lock length</Label>

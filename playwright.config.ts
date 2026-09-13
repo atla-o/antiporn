@@ -20,6 +20,11 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: false,
     timeout: 60_000,
+    env: {
+      ...process.env,
+      ANTIPORN_BACKEND: "local",
+      ANTIPORN_LOCK_DIR: "/tmp/antiporn-locks-e2e",
+    },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

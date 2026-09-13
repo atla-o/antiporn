@@ -47,6 +47,7 @@ export function NudityPreview() {
   const [notes, setNotes] = useState<string[]>([]);
   const [stats, setStats] = useState("Drop an image or generate a skin-tone fixture.");
   const [error, setError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"empty" | "loading" | "error" | "success">("empty");
 
   const runDetect = useCallback(() => {
     const canvas = canvasRef.current;
@@ -54,6 +55,7 @@ export function NudityPreview() {
     if (!canvas || !source) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    setPhase("loading");
     const { image, width, height } = downscaleForDetect(source);
     canvas.width = width;
     canvas.height = height;
@@ -64,6 +66,7 @@ export function NudityPreview() {
     setStats(
       `${result.boxes.length} square${result.boxes.length === 1 ? "" : "s"} · skin ${(result.skinRatio * 100).toFixed(1)}% · ${result.explicitLikely ? "explicit-likely" : "not explicit-likely"}`,
     );
+    setPhase("success");
   }, [state.severity]);
 
   useEffect(() => {
@@ -75,14 +78,18 @@ export function NudityPreview() {
     paintDemo(c);
     sourceRef.current = c;
     setError(null);
+    setPhase("loading");
     requestAnimationFrame(runDetect);
   }
 
   function onFile(file: File) {
     if (!file.type.startsWith("image/")) {
       setError("Use an image file.");
+      setPhase("error");
       return;
     }
+    setPhase("loading");
+    setError(null);
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
@@ -91,7 +98,10 @@ export function NudityPreview() {
       runDetect();
       URL.revokeObjectURL(url);
     };
-    img.onerror = () => setError("Could not read that image.");
+    img.onerror = () => {
+      setError("Could not read that image.");
+      setPhase("error");
+    };
     img.src = url;
   }
 
@@ -132,18 +142,42 @@ export function NudityPreview() {
             Generate skin fixture
           </Button>
         </div>
-        <div className="overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
+        <div className="relative min-h-40 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
+          {phase === "empty" && (
+            <p className="absolute inset-0 flex items-center justify-center p-4 text-sm text-neutral-500">
+              No still loaded.
+            </p>
+          )}
+          {phase === "loading" && (
+            <p className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 p-4 text-sm text-neutral-500">
+              Scanning…
+            </p>
+          )}
           <canvas ref={canvasRef} data-testid="nudity-canvas" className="max-h-[420px] w-full object-contain" />
         </div>
         <p className="font-mono text-xs text-neutral-600" data-testid="nudity-stats">
           {stats}
         </p>
+        {phase === "empty" && (
+          <p className="text-sm text-neutral-600" data-testid="nudity-empty">
+            Empty — generate a fixture or drop a still.
+          </p>
+        )}
+        {phase === "success" && (
+          <p className="text-sm text-black" data-testid="nudity-success">
+            Squares drawn on-device. Nothing left this browser.
+          </p>
+        )}
         {notes.map((n) => (
           <p key={n} className="text-sm text-black">
             {n}
           </p>
         ))}
-        {error && <p className="text-sm text-neutral-700">{error}</p>}
+        {error && (
+          <p className="text-sm text-black" data-testid="nudity-error">
+            {error}
+          </p>
+        )}
       </CardContent>
     </Card>
   );

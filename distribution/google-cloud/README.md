@@ -1,8 +1,10 @@
 # Google Cloud distribution
 
-Canonical binary host (not source):
+Canonical artifact bucket in project `devo-holding`:
 
-https://storage.googleapis.com/antiporn-releases/latest/
+`gs://antiporn-releases`
+
+The web UI does not link dead public GCS URLs (org policy blocks `allUsers`). Users download through `/api/distro/*` on Cloud Run `antiporn-web`, which reads this bucket.
 
 Publish these objects to the `antiporn-releases` bucket, `latest/` prefix:
 

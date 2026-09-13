@@ -25,6 +25,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 ENV HOST=0.0.0.0
+ENV GCP_PROJECT=devo-holding
+ENV GCS_BUCKET=antiporn-releases
 
 COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/.next/standalone ./

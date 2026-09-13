@@ -1,11 +1,11 @@
 "use client";
 
-import { DISTRO_CLOUD_EXTENSION_ZIP, DISTRO_CLOUD_INSTALL_SH, DISTRO_CLOUD_URL, GITHUB_URL } from "@/distribution/links";
+import { DISTRO_INSTALL_SH, DISTRO_WEBSITE_HTML, DISTRO_ZIP, GITHUB_URL, LOCAL_EMBED } from "@/distribution/links";
 
 const steps = [
   {
     title: "Install",
-    body: "Use drag-and-drop on Chromium, or paste the terminal installer when drop targets are blocked. Both pull the same package from Google Cloud Storage.",
+    body: "Download the extension zip from gs://antiporn-releases via this host’s distro API, or paste the terminal installer. website.html and the embed route are here too.",
   },
   {
     title: "Set severity",
@@ -13,11 +13,11 @@ const steps = [
   },
   {
     title: "Engage filter",
-    body: "Choose 1–30 days and type LOCK. Settings freeze. Closing the app does not stop the clock.",
+    body: "Choose 1–30 days and type LOCK. Settings freeze and persist through the Cloud Run lock API in devo-holding.",
   },
   {
     title: "Seal a vault if you need it",
-    body: "Up to 7 days, optional daily cap (for example 3 hours). No stop control. Factory reset is the abort.",
+    body: "Up to 7 days, optional daily cap (for example 3 hours). No stop control. The timer is stored on the server for this profile id.",
   },
   {
     title: "Keep the extension on",
@@ -36,13 +36,30 @@ export function HowToUse() {
         </li>
       ))}
       <li className="text-sm text-neutral-500">
-        Distro: <a className="underline" href={DISTRO_CLOUD_URL}>{DISTRO_CLOUD_URL}</a>
+        Installer:{" "}
+        <a className="underline" href={DISTRO_INSTALL_SH}>
+          install.sh
+        </a>
         {" · "}
-        Source: <a className="underline" href={GITHUB_URL}>{GITHUB_URL}</a>
+        Extension:{" "}
+        <a className="underline" href={DISTRO_ZIP}>
+          zip
+        </a>
         {" · "}
-        Installer: <a className="underline" href={DISTRO_CLOUD_INSTALL_SH}>install.sh</a>
+        Page:{" "}
+        <a className="underline" href={DISTRO_WEBSITE_HTML}>
+          website.html
+        </a>
         {" · "}
-        Extension: <a className="underline" href={DISTRO_CLOUD_EXTENSION_ZIP}>zip</a>
+        Embed:{" "}
+        <a className="underline" href={LOCAL_EMBED}>
+          /embed
+        </a>
+        {" · "}
+        Source:{" "}
+        <a className="underline" href={GITHUB_URL}>
+          {GITHUB_URL}
+        </a>
       </li>
     </ol>
   );

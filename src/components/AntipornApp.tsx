@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AntipornProvider, useAntiporn } from "@/components/AntipornProvider";
 import { ExtensionTab } from "@/components/ExtensionTab";
+import { FlowNote } from "@/components/FlowNote";
 import { HowToUse } from "@/components/HowToUse";
 import { InstallMethods } from "@/components/InstallMethods";
 import { NudityPreview } from "@/components/NudityPreview";
@@ -11,6 +13,17 @@ import { TimeVaultPanel } from "@/components/TimeVaultPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDuration } from "@/lib/utils";
 import { Shield } from "lucide-react";
+
+const TOP_TABS = ["filter", "vault", "install"] as const;
+const INSTALL_TABS = ["get", "preview", "extension"] as const;
+
+function parseHash() {
+  const raw = typeof window === "undefined" ? "" : window.location.hash.replace(/^#/, "");
+  const [topRaw, nestedRaw] = raw.split("/");
+  const top = TOP_TABS.includes(topRaw as (typeof TOP_TABS)[number]) ? topRaw : "filter";
+  const nested = INSTALL_TABS.includes(nestedRaw as (typeof INSTALL_TABS)[number]) ? nestedRaw : "get";
+  return { top, nested };
+}
 
 function CapOverlay() {
   const { capReached } = useAntiporn();
@@ -30,8 +43,23 @@ function CapOverlay() {
 }
 
 function InstallHub({ embed }: { embed?: boolean }) {
+  const [tab, setTab] = useState("get");
+
+  useEffect(() => {
+    const apply = () => setTab(parseHash().nested);
+    apply();
+    window.addEventListener("hashchange", apply);
+    return () => window.removeEventListener("hashchange", apply);
+  }, []);
+
   return (
-    <Tabs defaultValue="get">
+    <Tabs
+      value={tab}
+      onValueChange={(value) => {
+        setTab(value);
+        window.history.replaceState(null, "", `#install/${value}`);
+      }}
+    >
       <TabsList>
         <TabsTrigger value="get">Get Antiporn</TabsTrigger>
         <TabsTrigger value="preview">Preview</TabsTrigger>
@@ -68,7 +96,16 @@ function InstallHub({ embed }: { embed?: boolean }) {
 }
 
 function Shell({ embed }: { embed?: boolean }) {
-  const { ready, state, restrictionLeft, vaultLeft } = useAntiporn();
+  const { ready, storeWarning, syncStatus, persistLabel, profileId, state, restrictionLeft, vaultLeft } =
+    useAntiporn();
+  const [tab, setTab] = useState("filter");
+
+  useEffect(() => {
+    const apply = () => setTab(parseHash().top);
+    apply();
+    window.addEventListener("hashchange", apply);
+    return () => window.removeEventListener("hashchange", apply);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white text-black">
@@ -91,33 +128,57 @@ function Shell({ embed }: { embed?: boolean }) {
             <span className="rounded-md border border-neutral-300 px-2 py-1 font-mono">
               {state.vault.active ? `Vault ${formatDuration(vaultLeft)}` : "Vault off"}
             </span>
+            <span className="rounded-md border border-neutral-300 px-2 py-1 font-mono" data-testid="lock-sync">
+              {syncStatus}
+            </span>
+            <span className="rounded-md border border-neutral-300 px-2 py-1 text-neutral-600" title={profileId}>
+              {persistLabel}
+            </span>
           </div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">
         {!ready ? (
-          <p className="text-sm text-neutral-500">Restoring lock store…</p>
+          <FlowNote tone="loading" testId="store-loading">
+            Restoring lock store…
+          </FlowNote>
         ) : (
-          <Tabs defaultValue="filter">
-            <TabsList>
-              <TabsTrigger value="filter">Filter</TabsTrigger>
-              <TabsTrigger value="vault">Time vault</TabsTrigger>
-              <TabsTrigger value="install">Install</TabsTrigger>
-            </TabsList>
-            <TabsContent value="filter" className="grid gap-4 lg:grid-cols-2">
-              <RestrictionPanel />
-              <SeverityPanel />
-              <div className="lg:col-span-2">
-                <NudityPreview />
+          <>
+            {storeWarning && (
+              <div className="mb-4">
+                <FlowNote tone="error" testId="store-error">
+                  {storeWarning}
+                </FlowNote>
               </div>
-            </TabsContent>
-            <TabsContent value="vault">
-              <TimeVaultPanel />
-            </TabsContent>
-            <TabsContent value="install">
-              <InstallHub embed={embed} />
-            </TabsContent>
-          </Tabs>
+            )}
+            <Tabs
+              value={tab}
+              onValueChange={(value) => {
+                setTab(value);
+                const nested = value === "install" ? `/${parseHash().nested}` : "";
+                window.history.replaceState(null, "", `#${value}${nested}`);
+              }}
+            >
+              <TabsList>
+                <TabsTrigger value="filter">Filter</TabsTrigger>
+                <TabsTrigger value="vault">Time vault</TabsTrigger>
+                <TabsTrigger value="install">Install</TabsTrigger>
+              </TabsList>
+              <TabsContent value="filter" className="grid gap-4 lg:grid-cols-2">
+                <RestrictionPanel />
+                <SeverityPanel />
+                <div className="lg:col-span-2">
+                  <NudityPreview />
+                </div>
+              </TabsContent>
+              <TabsContent value="vault">
+                <TimeVaultPanel />
+              </TabsContent>
+              <TabsContent value="install">
+                <InstallHub embed={embed} />
+              </TabsContent>
+            </Tabs>
+          </>
         )}
       </main>
     </div>
