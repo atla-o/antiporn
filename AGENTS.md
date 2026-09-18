@@ -9,6 +9,14 @@ Priority order for every task unless Devo says otherwise:
 2. Black text on **white** backgrounds always — never follow system dark mode / white-on-black.
 3. Ship via merge to `main` (Cloud Run Actions). Do not deploy from the agent unless Devo explicitly says push/ship/merge and deploy.
 
+## Live UI preview
+
+Whenever you change the web UI and that change is **not yet pushed/merged to `main`** (branch work, local/dev server, PR not on production), you **must** paste a clickable **full URL** Devo can open inside Cursor to see the live UI as it changes — the Cloud Agent preview, tunnel, or forwarded-port URL Cursor exposes for the running app.
+
+- Screenshots alone are **not** enough.
+- Include the full URL in **every reply** while the UI is in flux.
+- Production https://antiporn.devoutshaman.com is only for what has already merged to `main`.
+
 Parent: Devo (lateral health). Publisher: atla-o. GCP app data: project `devo-holding`. Public hosts on `*.devoutshaman.com` (Cloudflare DNS-only → Cloud Run).
 
 Siblings: Phenomatch, Antiporn, Lessfret, Lightround, Acashi. Holding lander: atla-o/devo → devoutshaman.com.
