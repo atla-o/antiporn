@@ -1,58 +1,47 @@
-# Devo product workspace — Antiporn (web)
+# Antiporn — standing agent keeper
 
-## Standing objective (Devo UI-first)
+Read this file at the start of every run. This is the keeper for **one standing reusable Cloud Agent** on this repo. Do not spawn a sibling Antiporn web agent. Do not revive leftover Origin/GitHub `devon-schauman/antiporn` (dead/archived).
 
-Cursor cloud work for this product: **one promptable environment / one cloud workspace**, kept current.
+## What this repo is
 
-Priority order for every task unless Devo says otherwise:
-1. **Complete functional UI** — usable end-to-end (persist data, real submit paths, loading/empty/error/success). No blocking coming-soon for core flows.
-2. Black text on **white** backgrounds always — never follow system dark mode / white-on-black.
-3. Ship via merge to `main` (Cloud Run Actions). Do not deploy from the agent unless Devo explicitly says push/ship/merge and deploy.
+[`atla-o/antiporn`](https://github.com/atla-o/antiporn) is the **Antiporn web app plus its browser extension**: an installable product of **Atla LLC** (Devo’s only corp). It lives under the **Wellness** division.
 
-## Live UI preview
-
-Whenever you change the web UI and that change is **not yet pushed/merged to `main`** (branch work, local/dev server, PR not on production), you **must** paste a clickable **full URL** Devo can open inside Cursor to see the live UI as it changes — the Cloud Agent preview, tunnel, or forwarded-port URL Cursor exposes for the running app.
-
-- Screenshots alone are **not** enough.
-- Include the full URL in **every reply** while the UI is in flux.
-- Production https://antiporn.devoutshaman.com is only for what has already merged to `main`.
-
-Parent: Devo (lateral health). Publisher: atla-o. GCP app data: project `devo-holding`. Public hosts on `*.devoutshaman.com` (Cloudflare DNS-only → Cloud Run).
-
-Siblings: Phenomatch, Antiporn, Lessfret, Lightround, Acashi. Holding lander: atla-o/devo → devoutshaman.com.
-
-## WORKSPACE RULE (LOUD) — one cloud env for Antiporn
-
-| Where | Repo | Role |
-| --- | --- | --- |
-| **Cloud Agents / Cursor cloud workspace** | **`atla-o/antiporn`** (this repo) | Public web UI only |
-| **Local Mac / My Machines** | **`atla-o/anti-porn`** (private) | Native Swift filter / daemon / overlay |
-
-- **THIS REPO = public web UI only** (`antiporn.devoutshaman.com`).
-- Native Swift is private `atla-o/anti-porn` (Mac / My Machines only).
-- **Do not treat `anti-porn` as a second cloud web workspace.**
-- **One cloud workspace = this web repo** (`atla-o/antiporn`).
-- Extra cloud workspaces pointing at Antiporn should be **closed**; one env per product.
-
-## This product
-
-Antiporn. Computer restriction. Blocks porn and anything the user flags as a net negative.
-
-- Public OSS web UI: **this repo** — Filter, Time vault, Install (Preview + Extension nested), black-and-white chrome
 - Public host: https://antiporn.devoutshaman.com
-- Native Swift (private): [atla-o/anti-porn](https://github.com/atla-o/anti-porn) — Mac only
-- Sibling: [atla-o/phenomatch](https://github.com/atla-o/phenomatch) (same half-cloud / half-local process for device-native work)
-- Holding: [atla-o/devo](https://github.com/atla-o/devo)
+- Cloud Run service: `antiporn-web` (GCP project `devo-holding`, region `us-west1`)
+- Filter, Time vault, Install (Preview + Extension nested), black-and-white chrome
+- This product is live. Do not frame work as test-mode, demo-only, or “this isn’t live.”
 
-## Half cloud / half local
+A **separate private Mac app** (Swift filter / daemon / overlay) lives in [`atla-o/anti-porn`](https://github.com/atla-o/anti-porn) (later name: `antiporn-mac`). That repo is out of scope for this cloud agent unless Devo explicitly asks. A Linux cloud VM cannot drive native Mac UI or local audio.
 
-- **Cloud (Cursor cloud agent):** web app, backend, GCP, GitHub, docs — **only** against `atla-o/antiporn`.
-- **Local Mac (Cursor on the machine, or Cursor My Machines):** Swift filter, daemon, overlay, installer, simulator — against `atla-o/anti-porn`.
+## How it relates to `atla-o/devo`
 
-A Linux cloud VM cannot drive local audio or native Mac UI. Do not run native Swift work in cloud.
+The corp website is **one repo**, [`atla-o/devo`](https://github.com/atla-o/devo), with **six equal divisions** (say **division**, never “stream” or “house”):
 
-## Holding
+Physics: Products, Modified, Creation.  
+Biology: Consumed, Wellness, Covenant.
 
-Devo. GitHub publisher [`atla-o`](https://github.com/atla-o). GCP project `devo-holding` (org `atla-o.com`, folder `Devo`). App data is GCP, not Firebase.
+Wellness fertility and surrogacy pages on that site **link here**. Antiporn does **not** deploy from `atla-o/devo`. Merge to `main` in **this** repo deploys `antiporn-web`. `devo-web` deploys from `atla-o/devo`.
 
-Do not deploy to GCP from a cloud agent. GitHub Actions on `main` deploys Cloud Run service `antiporn-web`.
+Publisher: [`atla-o`](https://github.com/atla-o). GCP: project `devo-holding` (org `atla-o.com`, folder `Devo`). App data is GCP, not Firebase. Public hosts on `*.devoutshaman.com` (Cloudflare DNS-only → Cloud Run). No Workers, no orange-cloud proxy, no beta host.
+
+## Standing UI-first objective
+
+Keep **one promptable cloud workspace** for this product, current.
+
+1. **Complete functional UI** — usable end-to-end (persist data, real submit paths, loading / empty / error / success). No blocking coming-soon for core flows.
+2. Black text on **white** backgrounds always — never follow system dark mode / white-on-black.
+3. Ship by opening a PR. **Devo approves merges to `main`.** GitHub Actions on `main` deploys Cloud Run. Do not `gcloud run deploy` from this agent unless Devo explicitly says deploy.
+
+## Data rules
+
+Antiporn does **not** collect SSN or gene/DNA data. Do not add forms, storage, analytics, or APIs that take Social Security numbers, genetic files, DNA sequences, or genealogy uploads. Lock-store state (filter, vault, severity) is profile-scoped restriction data only.
+
+## Workflow (every run)
+
+1. **One standing reusable agent** — this agent, this repo. Extra Antiporn cloud workspaces should be closed.
+2. **Pull `main` fresh**, then **branch plus PR**. Never push or merge to `main` yourself. Devo merges.
+3. **CI must pass** (`npm run build`; `npm run test:ui` when UI is touched).
+4. **Live UI preview:** whenever the web UI changes and that change is not yet on `main`, keep a clickable Cloud Agent preview / tunnel / forwarded-port URL running, paste the **full URL** in every reply while the UI is in flux, **and post the same link in the PR**. Screenshots alone are not enough. https://antiporn.devoutshaman.com is only what has already merged to `main`.
+5. Docs-only PRs do not need a preview URL.
+
+Native Swift, Apple Developer, Mac App Store, and notarization stay on the Mac repo unless Devo asks otherwise.
